@@ -30,7 +30,7 @@ app.use('/api/v1/users', userRouter);
 
 // 404 Routing
 app.all('*', (req, res, next) => {
-    next(new appError(`Unable to find ${req.originalUrl} on this server...`), 404);
+    next(new appError(`Unable to find ${req.originalUrl} on this server...`, 404));
 }) // Anything passed into next is assumed an error, skipping to the error handling middleware in the middleware stack
 
 app.use(globalErrorHandler);
