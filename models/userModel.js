@@ -41,7 +41,18 @@ const userSchema = new mongoose.Schema({
     },
     passwordChangedAt: Date,
     passwordResetToken: String,
-    passwordResetExpres: Date
+    passwordResetExpres: Date,
+    active: {
+        type: Boolean,
+        default: true,
+        select: false
+    }
+})
+
+// Query Middleware (points to current query) 
+userSchema.pre(/^find/, function(next) {
+    this.find({ active: { $ne: false } });
+    next();
 })
 
 userSchema.pre('save', async function(next){

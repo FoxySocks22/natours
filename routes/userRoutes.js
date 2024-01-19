@@ -12,9 +12,14 @@ const router = express.Router();
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);
 
+// User Management
+router.patch ('/update-account', authController.protect, userController.updateMe);
+router.delete ('/delete-account', authController.protect, userController.deleteMe);
+
 // Password Management
 router.post('/forgot-password', authController.forgotPassword);
 router.patch('/reset-password/:token', authController.resetPassword);
+router.patch('/update-my-password', authController.protect,  authController.updatePassword);
 
 router.route('/')
 .get(userController.getAllUsers)
