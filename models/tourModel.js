@@ -74,7 +74,37 @@ const toursSchema = new mongoose.Schema({
     secretTour: {
         type: Boolean,
         default: false
-    }
+    },
+    startLocation: {
+        // geoJSON
+        type: {
+            type: String,
+            default: 'Point',
+            enum: ['Point']
+        },
+        coordinates: [Number],
+        address: String,
+        description: String
+    },
+    locations: [
+        {
+            type: {
+                type: String,
+                default: 'Point',
+                enum: ['Point']
+            },
+            coordinates: [Number],
+            address: String,
+            description: String,
+            day: Number
+        },
+    ],
+    guides: [
+        {
+            type: mongoose.Schema.ObjectId,
+            ref: 'User'
+        }
+    ]
 }, {
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
@@ -82,7 +112,7 @@ const toursSchema = new mongoose.Schema({
 
 toursSchema.virtual('durationInWeeks').get(function(){
     const weeks = this.duration / 7;
-    return weeks.toFixed(1); // A realy function was used to access the this keyword
+    return weeks.toFixed(1); // A real function was used to access the this keyword
 }) // A virtual property is returned with the data but not saved in the DB
 
 // Document middleware
@@ -95,11 +125,6 @@ toursSchema.pre('save', function(next) {
 // You can have multiple pre & post save hooks 
 // Use next all the time for good practise
 
-toursSchema.post('save', function(doc, next) {
-    console.log(`${doc.name} was saved to the database.`);
-    next();
-})
-
 // Query middleware
 toursSchema.pre(/^find/, function(next){
     this.find({ secretTour: { $ne: true } });
@@ -109,6 +134,19 @@ toursSchema.pre(/^find/, function(next){
 
 toursSchema.pre(/^find/, function(next, docs){
     console.log(`This query took ${Date.now() - this.start} ms to execute.`);
+    next();
+})
+
+toursSchema.pre(/^find/, function(next){
+    this.populate({
+        path: 'guides',
+        select: '-__v -passwordChangedAt'
+    })
+    next();
+})
+
+toursSchema.post('save', function(doc, next) {
+    console.log(`${doc.name} was saved to the database.`);
     next();
 })
 
