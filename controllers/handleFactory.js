@@ -41,7 +41,7 @@ exports.getAll = Model => catchAsync(async (req, res, next) => {
     .projection()
     .pagination();
     // Execute The Query
-    const doc = await features.query;
+    const doc = await features.query; //add .explain() for info about the query
     // Send Response
     res.status(200).json({
         status: 'success',

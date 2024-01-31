@@ -32,7 +32,8 @@ const toursSchema = new mongoose.Schema({
         type: Number, 
         default: 4.5,
         min: [1, 'Ratings can not be below 1.'],
-        max: [5, 'Ratings can not be above 5.']
+        max: [5, 'Ratings can not be above 5.'],
+        set: val => Math.round(val * 10) / 10
     },
     ratingsQuantity: {
         type: Number, 
@@ -109,6 +110,14 @@ const toursSchema = new mongoose.Schema({
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
 })
+
+toursSchema.index({ slug: 1 }); 
+toursSchema.index({ price: 1, ratingsAverage: -1 }); 
+/* Remember 1 is ascending and -1 is decending oder
+This is compounf indexing, it helps with performance of queries better 
+at scale. Apply these depending on access frequency, so price and rating are
+likely to be more common than group size. Indexes are resources and thus 
+have a cost to use, so use them appropriately. */
 
 toursSchema.virtual('durationInWeeks').get(function(){
     const weeks = this.duration / 7;
