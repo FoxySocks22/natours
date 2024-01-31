@@ -8,18 +8,23 @@ const authController = require('./../controllers/authController');
 // Variables
 const router = express.Router();
 
-// Routes
+// Signup & Password Management
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);
-
-// User Management
-router.patch ('/update-account', authController.protect, userController.updateMe);
-router.delete ('/delete-account', authController.protect, userController.deleteMe);
-
-// Password Management
 router.post('/forgot-password', authController.forgotPassword);
 router.patch('/reset-password/:token', authController.resetPassword);
-router.patch('/update-my-password', authController.protect,  authController.updatePassword);
+
+// Protect all routes after this middleware
+router.use(authController.protect);
+
+// User Management
+router.patch('/update-my-password', authController.updatePassword);
+router.get('/me', userController.getMe, userController.getUser);
+router.patch('/updateMe', userController.updateMe);
+router.delete('/deleteMe', userController.deleteMe);
+
+// Admin Functions
+router.use(authController.restrictTo('admin'));
 
 router.route('/')
 .get(userController.getAllUsers)
@@ -28,11 +33,7 @@ router.route('/')
 router.route('/:id')
 .get(userController.getUser)
 .patch(userController.updateUser)
-.delete(
-    authController.protect, 
-    authController.restrictTo('admin', 'lead-guide'), 
-    userController.deleteUser
-);
+.delete(userController.deleteUser);
 
 // Exports
 module.exports = router;

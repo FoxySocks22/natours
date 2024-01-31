@@ -19,11 +19,11 @@ const reviewSchema = new mongoose.Schema({
         type: Date,
         default: Date.now()
     },
-    author: [
+    user: [
         {
             type: mongoose.Schema.ObjectId,
             ref: 'User',
-            required: [true, 'Review must have ann author.']
+            required: [true, 'Review must have an author.']
         }
     ],
     tour: [
@@ -37,6 +37,14 @@ const reviewSchema = new mongoose.Schema({
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
 }) // Allow virtual output to be visible on response data (virtual methods)
+
+reviewSchema.pre(/^find/, function(next){
+    this.populate({
+        path: 'user',
+        select: 'name photo'
+    })
+    next();
+})
 
 const Review = mongoose.model('Review', reviewSchema);
 module.exports = Review;

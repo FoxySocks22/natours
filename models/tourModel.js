@@ -156,6 +156,15 @@ toursSchema.pre('aggregate', function(next){
     next();
 }) // The this keyword here refers to the current aggregation object 
 
+// Virtual Populate
+toursSchema.virtual('reviews', {
+    ref: 'Review',
+    foreignField: 'tour',
+    localField: '_id'
+}) 
+/* Similar to SQL joins, it will link the ID field in this model to 
+the tour field in the review model */
+
 const Tour = mongoose.model('Tour', toursSchema);
 
 module.exports = Tour;

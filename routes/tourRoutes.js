@@ -2,14 +2,17 @@
 const express = require('express');
 
 // Custom Imports 
+const reviewRouter = require('./../routes/reviewRoutes');
 const tourController = require('./../controllers/tourController');
 const authController = require('./../controllers/authController');
 
 // Variables
 const router = express.Router();
 
-// Custom Middleware
-// router.param('id', tourController.checkId);
+router.use('/:tourId/reviews', reviewRouter);
+/* Routers are still just middleware, so we can use the USE keyword. 
+The code above is enabling nexted routes, and is basically saying if a URL looks 
+like this, use the review route instead. This is still mounting a router. */
 
 // Routes
 router.route('/top-5-cheap')
@@ -17,16 +20,24 @@ router.route('/top-5-cheap')
 
 router.route('/tour-stats').get(tourController.getTourStats);
 
-router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan);
+router.route('/monthly-plan/:year').get(
+    authController.protect, 
+    authController.restrictTo('admin', 'lead-guide', 'guide'), 
+    tourController.getMonthlyPlan);
 
 router.route('/')
-.get(authController.protect, tourController.getAllTours)
-.post(tourController.createTour);
+.get(tourController.getAllTours)
+.post(
+    authController.protect, 
+    authController.restrictTo('admin', 'lead-guide'), 
+    tourController.createTour);
 
 router.route('/:id')
 .get(tourController.getTour)
-.patch(tourController.updateTour)
-
+.patch(
+    authController.protect, 
+    authController.restrictTo('admin', 'lead-guide'), 
+    tourController.updateTour)
 .delete(
     authController.protect, 
     authController.restrictTo('admin', 'lead-guide'), 
