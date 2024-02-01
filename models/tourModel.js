@@ -113,6 +113,7 @@ const toursSchema = new mongoose.Schema({
 
 toursSchema.index({ slug: 1 }); 
 toursSchema.index({ price: 1, ratingsAverage: -1 }); 
+toursSchema.index({ startLocation: '2dsphere' });
 /* Remember 1 is ascending and -1 is decending oder
 This is compounf indexing, it helps with performance of queries better 
 at scale. Apply these depending on access frequency, so price and rating are
@@ -160,10 +161,11 @@ toursSchema.post('save', function(doc, next) {
 })
 
 // Aggregation middleware
-toursSchema.pre('aggregate', function(next){
-    this.pipeline().unshift({ $match: { secretTour: { $ne: true }}});
-    next();
-}) // The this keyword here refers to the current aggregation object 
+// toursSchema.pre('aggregate', function(next){
+//     this.pipeline().unshift({ $match: { secretTour: { $ne: true }}});
+//     next();
+// }) 
+// The this keyword here refers to the current aggregation object 
 
 // Virtual Populate
 toursSchema.virtual('reviews', {
