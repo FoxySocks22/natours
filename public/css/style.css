@@ -43,7 +43,7 @@ body {
   flex-direction: column;
 }
 
-.main {
+main {
   background-color: #f7f7f7;
   padding: 8rem 6rem;
   -webkit-box-flex: 1;
@@ -325,6 +325,7 @@ body {
 .header__logo img {
   height: 3.5rem;
 }
+
 @media only screen and (max-width: 62.5em) {
   .header__logo {
     -webkit-box-ordinal-group: 0;

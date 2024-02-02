@@ -1,0 +1,21 @@
+doctype html
+html
+    head
+        <title>Natours | #{title}</title>
+        meta(charset='UTF-8')
+        meta(name='viewport' content='width=device-width, initial-scale=1.0')
+        link(rel='shortcut icon' type='image/png' href='/img/favicon.png')
+        link(rel='stylesheet' type='text/css' href='/css/style.css')
+        link(href='https://fonts.googleapis.com/css?family=Lato:300,300i,700' rel='stylesheet')
+    body
+        include _header
+        block content
+            h1 this is a placeholder
+        include _footer
+
+//- Notes
+//- Buffered code adds something to the DOM, whereas unbuffered code does not.
+//- Prefix code with a - to make it unbiffered code E.G. - const age = 29
+//- This type of comment is not visible in the DOM whereas // types are.
+//- ADD A METHOD IN UTILS TO CAPITALISE STRING
+//- div being the standard block elm in HTML means we don't need to specifiy it with pug, we just use .className
