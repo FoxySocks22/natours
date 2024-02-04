@@ -1323,3 +1323,23 @@ main {
   -webkit-transform: translateY(-2px);
   transform: translateY(-2px);
 }
+
+span.error {
+  color: red;
+}
+
+span.valid {
+  color: green;
+}
+
+span.valid,
+span.error {
+  font-weight: bold;
+  font-size: 16px;
+  display: block;
+  text-align: center;
+  margin: 10px 0;
+  position: absolute;
+  top: 25px;
+}
+

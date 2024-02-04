@@ -1,17 +1,21 @@
 doctype html
 html
-    head
-        <title>Natours | #{title}</title>
-        meta(charset='UTF-8')
-        meta(name='viewport' content='width=device-width, initial-scale=1.0')
-        link(rel='shortcut icon' type='image/png' href='/img/favicon.png')
-        link(rel='stylesheet' type='text/css' href='/css/style.css')
-        link(href='https://fonts.googleapis.com/css?family=Lato:300,300i,700' rel='stylesheet')
+    block head
+        head
+            <title>Natours | #{title}</title>
+            meta(charset='UTF-8')
+            meta(name='viewport' content='width=device-width, initial-scale=1.0')
+            link(rel='shortcut icon' type='image/png' href='/img/favicon.png')
+            link(rel='stylesheet' type='text/css' href='/css/style.css')
+            link(href='https://fonts.googleapis.com/css?family=Lato:300,300i,700' rel='stylesheet')
     body
         include _header
         block content
             h1 this is a placeholder
-        include _footer
+        block footer
+            include _footer
+            script(src='https://unpkg.com/axios/dist/axios.min.js')
+            script(src='/js/login.js')
 
 //- Notes
 //- Buffered code adds something to the DOM, whereas unbuffered code does not.

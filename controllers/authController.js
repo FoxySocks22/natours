@@ -25,7 +25,7 @@ const createSendToken = (user, statusCode, res) => {
     }// 24 * 60 * 60 * 1000 is milisecond conversion
     if(process.env.NODE_ENV === 'production') cookieOptions.secure = true;
     user.password = undefined; // Remove password from response data 
-    res.cookie('jtw', token, cookieOptions )
+    res.cookie('jwt', token, cookieOptions )
     res.status(statusCode).json({
         status: 'success',
         token,
@@ -63,6 +63,8 @@ exports.protect = catchAsync(async(req, res, next) => {
     let token;
     if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
         token = req.headers.authorization.split(' ')[1];
+    } else if (req.cookies.jwt) {
+        token = req.cookies.jwt
     }
     if(!token){
         return next(new AppError('You are not logged in.', 401));
@@ -74,6 +76,22 @@ exports.protect = catchAsync(async(req, res, next) => {
         return next(new AppError('Your password was recently changed, please login again.', 401));
     }
     req.user = currentUser; 
+    next();
+}) 
+
+// Only for rendered pages, and will never throw any errors
+exports.isLoggedIn = catchAsync(async(req, res, next) => {
+    if(req.cookies.jwt) {
+        const decode = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRET);
+        const currentUser = await User.findById(decode.id);
+        if(!currentUser) return next();
+        if(currentUser.changedPasswordAfter(decode.iat)){
+            return next();
+        }
+        // This makes the data available to template files
+        res.locals.user = currentUser;
+        return next();
+    }
     next();
 }) 
 

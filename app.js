@@ -7,6 +7,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const cookieParser = require('cookie-parser');
 
 // Custom Imports
 const tourRouter = require('./routes/tourRoutes');
@@ -27,11 +28,49 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Global Middleware 
 app.use(helmet()); // Security headers
 
+const scriptSrcUrls = [
+    'https://unpkg.com/', 
+    'https://tile.openstreetmap.org'
+];
+
+const styleSrcUrls = [
+    'https://unpkg.com/',
+    'https://tile.openstreetmap.org',
+    'https://fonts.googleapis.com/'
+];
+
+const connectSrcUrls = [
+    'https://unpkg.com', 
+    'https://tile.openstreetmap.org'
+];
+
+const fontSrcUrls = [
+    'fonts.googleapis.com', 
+    'fonts.gstatic.com'
+];
+ 
+//set security http headers
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            defaultSrc: [],
+            connectSrc: ["'self'", ...connectSrcUrls],
+            scriptSrc: ["'self'", ...scriptSrcUrls],
+            styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
+            workerSrc: ["'self'", 'blob:'],
+            objectSrc: [],
+            imgSrc: ["'self'", 'blob:', 'data:', 'https:'],
+            fontSrc: ["'self'", ...fontSrcUrls]
+        }
+    })
+);
+
+
 const limiter = rateLimit({
     max: 100,
     windowMs: 60 * 60 * 1000,
     message: 'Too many requests from this IP, please try again in an hour.'
-}) // The max value needs to make sense for the traffic the api will recieve
+}) 
 
 app.use('/api', limiter);
 
@@ -66,6 +105,8 @@ if(process.env.NODE_ENV === 'development'){
 app.use(express.json({
     limit: '10kb'
 })); // Limit size of body
+
+app.use(cookieParser());
 
 app.use((req, res, next) => {
     req.requestTime = new Date().toISOString();
