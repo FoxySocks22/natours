@@ -1,16 +1,10 @@
 /* eslint-disable */
 
-const displayMessage = (className, messgae) => {
-    const displayError = document.getElementById('message');
-    displayError.innerHTML = messgae;
-    displayError.classList = '';
-    displayError.classList.add(className);
-    if(className === 'valid') {
-        window.setTimeout(() => {
-            location.assign('/');
-        }, 1500);
-    }
-}
+// Modules
+import { showAlert } from './alert.js';
+
+const loginForm = document.getElementById('login-form');
+const logoutBtn = document.getElementById('logout');
 
 const login = async(email, password) => {
     try {
@@ -23,16 +17,43 @@ const login = async(email, password) => {
             }
         })
         if(res.data.status === 'success') {
-            displayMessage('valid', `welcome back ${res.data.data.user.name}`);
+            showAlert('success', `Welcome back ${res.data.data.user.name.split(' ')[0]}`);
+            window.setTimeout(() => {
+                location.assign('/');
+            }, 1500);
         }
     } catch(err) {
-        displayMessage('error', err.response.data.message);
+        showAlert('error', err.response.data.message);
     }
 }
 
-document.querySelector('.form').addEventListener('submit', e => {
-    e.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    login(email, password);
-})
+if(loginForm){
+    loginForm.addEventListener('submit', e => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        login(email, password);
+    })
+}
+
+const logout = async() => {
+    try {
+        const res = await axios({
+            method: 'get',
+            url: 'http://127.0.0.1:8000/api/v1/users/logout'
+        });
+        if(res.data.status === 'success') {
+            showAlert('success', 'Goodbye, see you next time.');
+            window.setTimeout(() => {
+                location.reload(true);
+            }, 2000);
+        }
+    } catch(err) {
+        showAlert('error', 'Something went wrong.');
+    }
+}
+
+if(logoutBtn) logoutBtn.addEventListener('click', logout);
+
+// The true on location.reload(true) forces a reload from the server
+// Look into bundler and polyfill

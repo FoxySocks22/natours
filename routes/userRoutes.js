@@ -11,6 +11,7 @@ const router = express.Router();
 // Signup & Password Management
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);
+router.get('/logout', authController.logout);
 router.post('/forgot-password', authController.forgotPassword);
 router.patch('/reset-password/:token', authController.resetPassword);
 
@@ -20,8 +21,8 @@ router.use(authController.protect);
 // User Management
 router.patch('/update-my-password', authController.updatePassword);
 router.get('/me', userController.getMe, userController.getUser);
-router.patch('/updateMe', userController.updateMe);
-router.delete('/deleteMe', userController.deleteMe);
+router.patch('/update-account', userController.updateMe);
+router.delete('/delete-account', userController.deleteMe);
 
 // Admin Functions
 router.use(authController.restrictTo('admin'));

@@ -1,6 +1,7 @@
 // Custom Imports
 const Tour = require('./../models/tourModel');
 const catchAsync = require('./../utils/catchAsync');
+const AppError = require('./../utils/appError');
 
 exports.getOverview = catchAsync(async(req, res, next) => {
     const tours = await Tour.find();
@@ -15,6 +16,9 @@ exports.getTour = catchAsync(async(req, res, next) => {
         path: 'reviews',
         fields: 'review rating user'
     });
+    if(!tour){
+        return next(new AppError('No tour found with that name.', 404));
+    }
     res.status(200).render('tour', {
         title: `${tour.name} Tour`,
         tour
@@ -24,5 +28,11 @@ exports.getTour = catchAsync(async(req, res, next) => {
 exports.getLogin = (req, res) => {
     res.status(200).render('login', {
         title: 'Login'
+    })
+}
+
+exports.getAccount = (req, res) => {
+    res.status(200).render('account', {
+        title: 'My account'
     })
 }

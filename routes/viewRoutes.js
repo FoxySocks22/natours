@@ -8,12 +8,10 @@ const authController = require('./../controllers/authController');
 // Variables
 const router = express.Router();
 
-// Middleware
-router.use(authController.isLoggedIn);
-
 // Routing
-router.get('/', viewsController.getOverview);
-router.get('/tour/:slug', viewsController.getTour);
-router.get('/login', viewsController.getLogin);
+router.get('/', authController.isLoggedIn, viewsController.getOverview);
+router.get('/tour/:slug', authController.isLoggedIn, viewsController.getTour);
+router.get('/login', authController.isLoggedIn, viewsController.getLogin);
+router.get('/me', authController.protect, viewsController.getAccount);
 // Exports
 module.exports = router;

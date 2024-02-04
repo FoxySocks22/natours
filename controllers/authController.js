@@ -59,6 +59,16 @@ exports.login = catchAsync(async(req, res, next) => {
     createSendToken(user, 200, res);
 });
 
+exports.logout = (req, res) => {
+    res.cookie('jwt', 'loggedOut', {
+        expires: new Date(Date.now() + 500),
+        httpOnly: true
+    })
+    res.status(200).json({
+        status: 'success'
+    })
+}
+
 exports.protect = catchAsync(async(req, res, next) => {
     let token;
     if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
@@ -75,25 +85,30 @@ exports.protect = catchAsync(async(req, res, next) => {
     if(currentUser.changedPasswordAfter(decode.iat)){
         return next(new AppError('Your password was recently changed, please login again.', 401));
     }
-    req.user = currentUser; 
+    req.user = currentUser;
+    res.locals.user = currentUser;
     next();
 }) 
 
 // Only for rendered pages, and will never throw any errors
-exports.isLoggedIn = catchAsync(async(req, res, next) => {
-    if(req.cookies.jwt) {
-        const decode = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRET);
-        const currentUser = await User.findById(decode.id);
-        if(!currentUser) return next();
-        if(currentUser.changedPasswordAfter(decode.iat)){
+exports.isLoggedIn = async(req, res, next) => {
+    try {
+        if(req.cookies.jwt) {
+            const decode = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRET);
+            const currentUser = await User.findById(decode.id);
+            if(!currentUser) return next();
+            if(currentUser.changedPasswordAfter(decode.iat)){
+                return next();
+            }
+            // This makes the data available to template files
+            res.locals.user = currentUser;
             return next();
         }
-        // This makes the data available to template files
-        res.locals.user = currentUser;
+    } catch(err) {
         return next();
     }
     next();
-}) 
+}
 
 exports.restrictTo = (...roles) => {
     return (req, res, next) => {
