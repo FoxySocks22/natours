@@ -21,8 +21,16 @@ router.use(authController.protect);
 // User Management
 router.patch('/update-my-password', authController.updatePassword);
 router.get('/me', userController.getMe, userController.getUser);
-router.patch('/update-account', userController.updateMe);
+router.patch('/update-account', 
+    userController.uploadUserPhoto,
+    userController.resizeUserPhoto,
+    userController.updateMe
+);
 router.delete('/delete-account', userController.deleteMe);
+
+/* upload.single('photo') means only one file will be uploaded from the 
+form field called photo. It adds some info about the file to 
+the req object as well */
 
 // Admin Functions
 router.use(authController.restrictTo('admin'));
