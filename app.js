@@ -13,6 +13,7 @@ const cookieParser = require('cookie-parser');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
+const bookingRouter = require('./routes/bookingRoutes');
 const viewRouter = require('./routes/viewRoutes');
 const appError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -26,11 +27,14 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Global Middleware 
-app.use(helmet()); // Security headers
+// Security headers
+app.use(helmet()); 
 
 const scriptSrcUrls = [
     'https://unpkg.com/', 
-    'https://tile.openstreetmap.org'
+    'https://tile.openstreetmap.org',
+    'https://js.stripe.com/v3/',
+    'https://js.stripe.com/'
 ];
 
 const styleSrcUrls = [
@@ -53,7 +57,7 @@ const fontSrcUrls = [
 app.use(
     helmet.contentSecurityPolicy({
         directives: {
-            defaultSrc: [],
+            defaultSrc: ["'self'", "js.stripe.com"],
             connectSrc: ["'self'", ...connectSrcUrls],
             scriptSrc: ["'self'", ...scriptSrcUrls],
             styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
@@ -64,7 +68,6 @@ app.use(
         }
     })
 );
-
 
 const limiter = rateLimit({
     max: 100,
@@ -118,6 +121,7 @@ app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/booking', bookingRouter);
 
 // 404 Routing
 app.all('*', (req, res, next) => {

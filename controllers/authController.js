@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const User = require('./../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
-const sendMail = require('./../utils/email');
+const Email = require('./../utils/email');
 
 // Methods 
 const signToken = id => {
@@ -39,11 +39,11 @@ exports.signup = catchAsync(async(req, res, next) => {
     const newUser = await User.create({
         name: req.body.name,
         email: req.body.email,
-        // role: req.body.role,
         password: req.body.password,
         passwordConfirm: req.body.passwordConfirm
-        // passwordChangedAt: req.body.passwordChangedAt
     });
+    const url = `${req.protocol}://${req.get('host')}/me`;
+    await new Email(newUser, url).sendWelcome();
     createSendToken(newUser, 201, res);
 });
 
@@ -126,16 +126,12 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
         return next(new AppError('user not found', 404));
     } 
     const resetToken = user.createPasswordResetToken();
-     await user.save({ validateBeforeSave: false }); // this deactivates model validators
-    const restUrl = 
-    `${req.protocol}://${req.get('host')}/api/v1/users/reset-password/${resetToken}`;
-    const message = `Reset your password by navigating to this link: ${restUrl}\nIf you did not request this email, please delete it immeditaley.`;
-    try {
-        await sendMail({
-            email: user.email,
-            subject: 'Password reset',
-            message: message
-        })
+    await user.save({ validateBeforeSave: false }); // this deactivates model validators
+     try {
+        const restUrl = 
+        `${req.protocol}://${req.get('host')}
+        /api/v1/users/reset-password/${resetToken}`;
+        await new Email(user, restUrl).sendPasswordReset();
         res.status(200).json({
             status: 'success',
             message: 'Reset link and token sent.'

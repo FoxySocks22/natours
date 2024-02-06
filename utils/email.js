@@ -1,33 +1,40 @@
 const nodemailer = require('nodemailer');
 const pug = require('pug');
-const htmlToText = require('html-to-text');
+const { convert } = require('html-to-text');
 
-module.exports = class email {
-    constructor(user, url){
-        this.to = user.email,
-        this.firstName = user.name.split(' ')[0],
-        this.url = url,
-        this.from = `Beau Buxton, <${process.env.EMAIL_ADDRESS}>`
+module.exports = class Email {
+    constructor(user, url) {
+        this.to = user.email;
+        this.firstName = user.name.split(' ')[0];
+        this.url = url;
+        this.from = `Beau Buxton <${process.env.EMAIL_ADDRESS}>`;
     }
-
-    newTrasnport(){
-        if(process.env.NODE_ENV === 'production'){
-            // Sendgrid
-            return 1;
+    
+    newTransport() {
+        // Sendgrid not actually implamented
+        if (process.env.NODE_ENV === 'production') {
+            return nodemailer.createTransport({
+                service: 'SendGrid',
+                auth: {
+                    user: process.env.SENDGRID_USERNAME,
+                    pass: process.env.SENDGRID_PASSWORD
+                }
+            });
         }
-        return transporter = nodemailer.createTransport({
+
+        return nodemailer.createTransport({
             host: process.env.EMAIL_HOST,
             port: process.env.EMAIL_PORT,
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASSWORD
             }
-        })
+        });
     }
-
-    async send(template, subject){
-        const html = pug.renderFile(`${__dirname}../views/emails/${template}.pug`, {
-            firstName: this.firstName, 
+    
+    async send(template, subject) {
+        const html = pug.renderFile(`${__dirname}/../views/emails/${template}.pug`, {
+            firstName: this.firstName,
             url: this.url,
             subject
         });
@@ -37,17 +44,17 @@ module.exports = class email {
             to: this.to,
             subject,
             html,
-            text: htmlToText.fromString(html)
-        }
+            text: convert(html)
+        };
 
-        await this.newTrasnport.sendMail(mailOptions);
+        await this.newTransport().sendMail(mailOptions);
     }
 
-    async sendWelcome(){
-        await this.send('welcome', 'Welcome to Natours!');
+    async sendWelcome() {
+        await this.send('welcome', 'Welcome to the Natours Family!');
     }
-    
-    async sendForgotPassword(){
-        await this.send('welcome', 'Welcome to Natours!');
+
+    async sendPasswordReset() {
+        await this.send('passwordReset','Your password reset link');
     }
-}
+};
