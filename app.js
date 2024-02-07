@@ -8,6 +8,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
+// const cors = require('cors');
 // const compression = require('compression');
 
 // Custom Imports
@@ -15,6 +16,7 @@ const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
+const bookingController = require('./controllers/bookingController');
 const viewRouter = require('./routes/viewRoutes');
 const appError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -28,6 +30,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Global Middleware 
+// app.use(cors());
+
 // Security headers
 app.use(helmet()); 
 
@@ -74,7 +78,13 @@ const limiter = rateLimit({
     max: 100,
     windowMs: 60 * 60 * 1000,
     message: 'Too many requests from this IP, please try again in an hour.'
-}) 
+})
+
+app.post(
+    '/webhook-checkout', 
+    express.raw({ type: 'application/json' }),
+    bookingController.webhookCheckout
+);
 
 app.use('/api', limiter);
 
