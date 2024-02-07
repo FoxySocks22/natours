@@ -11,8 +11,8 @@ const passwordResetButton = document.getElementById('pswd-reset');
 const updateSettings = async(data, type) => {
     try {
         const url = type === 'password' 
-        ? 'http://127.0.0.1:8000/api/v1/users/update-my-password' 
-        : 'http://127.0.0.1:8000/api/v1/users/update-account';
+        ? '/api/v1/users/update-my-password' 
+        : '/api/v1/users/update-account';
         const res = await axios({
             method: 'patch',
             url,
