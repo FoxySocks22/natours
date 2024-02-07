@@ -16,7 +16,7 @@ block content
             nav.user-view__menu
                 ul.side-nav
                     +navitem('#', 'Settings', 'settings', true)
-                    +navitem('#', 'My bookings', 'briefcase')
+                    +navitem('/my-bookings', 'My bookings', 'briefcase')
                     +navitem('#', 'My reviews', 'star')
                     +navitem('#', 'Billing', 'credit-card')
                 - if(user.role === 'admin')
