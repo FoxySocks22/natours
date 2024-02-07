@@ -112,7 +112,6 @@ exports.isLoggedIn = async(req, res, next) => {
 
 exports.restrictTo = (...roles) => {
     return (req, res, next) => {
-        console.log(roles, req.user.role);
         if(!roles.includes(req.user.role)){
             return next(new AppError('You do not have permission to perform this action', 403));
         }
@@ -137,7 +136,6 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
             message: 'Reset link and token sent.'
         }) // This creates an error, but if removed nothing works...
     } catch (err) {
-        console.log(err);
         user.passwordResetToken = undefined;
         user.passwordResetExpres = undefined;
         await user.save({ validateBeforeSave: false });

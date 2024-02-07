@@ -14,3 +14,4 @@ Additional study needed in:
 2) Removing depreciated things (see console log)
 3) Instance methods
 4) Closures
+5) Population

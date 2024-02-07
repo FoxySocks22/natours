@@ -8,6 +8,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
+const compression = require('compression');
 
 // Custom Imports
 const tourRouter = require('./routes/tourRoutes');
@@ -98,8 +99,9 @@ app.use(hpp({
     ] // This can be done better
 })); // Whitelist allows for duplicate params
 
+app.use(compression());
+
 // Third Party Middleware
-console.log(process.env.NODE_ENV);
 if(process.env.NODE_ENV === 'development'){
     app.use(morgan('dev')); 
 }
