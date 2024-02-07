@@ -61,7 +61,7 @@ const createBookingCheckout = catchAsync(async session => {
 })
 
 exports.webhookCheckout = (req, res, next) => {
-    const signature = req.headers('stripe-signature');
+    const signature = req.headers['stripe-signature'];
     let event;
     try {
         event = stripe.webhooks.constructEvent(
@@ -74,7 +74,6 @@ exports.webhookCheckout = (req, res, next) => {
     }
     if(event.type === 'checkout.session.completed') createBookingCheckout(event.data.object);
     res.status(200).json({ received: true });
-    next();
 } // This is pretty complicated TBH
 
 exports.createBooking = factory.createOne(Booking);
